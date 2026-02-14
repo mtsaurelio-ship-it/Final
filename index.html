@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PlantãoGest</title>
+    <!-- Font: Nunito for a more rounded, friendly look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              background: 'rgb(var(--color-background) / <alpha-value>)',
+              surface: 'rgb(var(--color-surface) / <alpha-value>)',
+              surfaceHighlight: 'rgb(var(--color-surface-highlight) / <alpha-value>)',
+              primary: 'rgb(var(--color-primary) / <alpha-value>)',
+              secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+              text: 'rgb(var(--color-text) / <alpha-value>)',
+              textMuted: 'rgb(var(--color-text-muted) / <alpha-value>)',
+            },
+            fontFamily: {
+              sans: ['Nunito', 'sans-serif'],
+            },
+            borderRadius: {
+              '4xl': '2rem',
+              '5xl': '2.5rem',
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      /* THEME VARIABLES - Vivid & Modern */
+      :root {
+        /* Dark Theme (Vivid Neon Style) */
+        --color-background: 15 15 20;       /* Deep Blue/Black */
+        --color-surface: 28 28 35;          /* Lighter Deep Blue */
+        --color-surface-highlight: 40 40 50; 
+        --color-primary: 99 102 241;        /* Indigo-500 Vivid */
+        --color-secondary: 236 72 153;      /* Pink-500 Vivid */
+        --color-text: 240 240 255;
+        --color-text-muted: 148 163 184;
+      }
+
+      .light {
+        /* Light Theme (Optimized for Readability & Contrast) */
+        --color-background: 241 245 249;    /* Slate-100: Clean soft gray-blue background */
+        --color-surface: 255 255 255;       /* Pure White */
+        --color-surface-highlight: 226 232 240; /* Slate-200: Distinct inputs/buttons */
+        --color-primary: 79 70 229;         /* Indigo-600 */
+        --color-secondary: 219 39 119;      /* Pink-600 */
+        --color-text: 15 23 42;             /* Slate-900: High contrast, sharp text */
+        --color-text-muted: 71 85 105;      /* Slate-600: Readable secondary text */
+      }
+
+      body {
+        background-color: rgb(var(--color-background));
+        color: rgb(var(--color-text));
+        transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+      }
+
+      /* Custom Scrollbar */
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      /* Smooth styling for inputs */
+      input, select, textarea {
+        transition: all 0.2s ease;
+      }
+      input:focus {
+        transform: scale-[1.01];
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react/": "https://esm.sh/react@18.2.0/",
+    "react-dom": "https://esm.sh/react-dom@18.2.0",
+    "react-dom/": "https://esm.sh/react-dom@18.2.0/",
+    "recharts": "https://esm.sh/recharts@2.12.3?external=react,react-dom",
+    "date-fns": "https://esm.sh/date-fns@3.6.0",
+    "date-fns/": "https://esm.sh/date-fns@3.6.0/",
+    "lucide-react": "https://esm.sh/lucide-react@0.358.0?external=react",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "@capacitor/core": "https://esm.sh/@capacitor/core@^8.1.0",
+    "@capacitor/local-notifications": "https://esm.sh/@capacitor/local-notifications@^8.0.1"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
