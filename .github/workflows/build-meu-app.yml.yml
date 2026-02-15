@@ -25,7 +25,14 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-- name: Gerar arquivos do Gradle (Caso faltem)
+      - name: Sincronizar Capacitor com Android
+        run: |
+          npx cap sync android
+
+      - name: Instalar Gradle no Servidor
+        run: sudo apt-get update && sudo apt-get install gradle -y
+
+      - name: Gerar arquivos do Gradle (Wrapper)
         run: |
           cd android
           gradle wrapper
