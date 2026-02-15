@@ -1,4 +1,4 @@
-name: Gerar APK Capacitor - Solucao Definitiva
+name: Gerar APK Capacitor - Solucao Definitiva v5
 on: workflow_dispatch
 
 jobs:
@@ -29,37 +29,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install gradle -y
 
-      - name: 6. Preparar Android e Gerar Executaveis
+      - name: 6. Recriar Pasta Android e Sincronizar
         run: |
-          # Adiciona a pasta android se ela não existir
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
-
-          # Sincroniza o código do site com o projeto Android
+          # Remove a pasta android se ela estiver incompleta ou com erro
+          rm -rf android
+          
+          # Adiciona a plataforma do zero
+          npx cap add android
+          
+          # Sincroniza os arquivos do site
           npx cap sync android
 
-          # Entra na pasta android e força a criação do wrapper
-          cd android
-          gradle wrapper --gradle-version 8.2.1
-          
-          # Verifica se o arquivo foi criado, se não, tenta criar de novo
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper
-          fi
-          
-          # Garante a permissão de execução
-          chmod +x gradlew
-          echo "Conteudo da pasta android:"
-          ls -F
-
-      - name: 7. Compilar APK (Debug)
-        working-directory: ./android
+      - name: 7. Compilar APK (Usando Gradle do Sistema)
         run: |
-          ./gradlew assembleDebug
+          cd android
+          # Em vez de ./gradlew, usamos o gradle do sistema que instalamos no passo 5
+          gradle assembleDebug
 
       - name: 8. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-sucesso
+          name: app-debug-final
           path: android/app/build/outputs/apk/debug/app-debug.apk
