@@ -57,35 +57,19 @@ jobs:
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      # 9. Forçar Java 17 no gradle.properties do wrapper
-      - name: Forçar Java 17 no Gradle Wrapper
-        run: |
-          cd android
-          echo "org.gradle.java.home=$JAVA_HOME" >> gradle.properties
-
-      # 10. Limpar Gradle
+      # 9. Limpar Gradle
       - name: Limpar Gradle
         run: |
           cd android
           ./gradlew clean
 
-      # 11. Forçar Java 17 em todos os build.gradle
-      - name: Forçar Java 17 em todos os módulos
+      # 10. Compilar APK forçando Java 17 (override de qualquer configuração de plugin)
+      - name: Compilar APK com Java 17
         run: |
           cd android
-          find . -name "build.gradle" -type f | while read file; do
-            sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' "$file" || true
-            sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' "$file" || true
-            sed -i 's/jvmTarget = .*/jvmTarget = "17"/' "$file" || true
-          done
+          ./gradlew assembleDebug -Dorg.gradle.java.home=$JAVA_HOME -Dkotlin.compiler.jvmTarget=17
 
-      # 12. Compilar APK
-      - name: Compilar APK
-        run: |
-          cd android
-          ./gradlew assembleDebug
-
-      # 13. Upload do APK como artefato
+      # 11. Upload do APK como artefato
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
