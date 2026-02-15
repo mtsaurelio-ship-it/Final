@@ -8,77 +8,81 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Checkout do código
+      # 1. Checkout do repositório
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: 2. Instalar Node.js (v22)
+      # 2. Instalar Node.js 22
+      - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: 3. Instalar Dependências
+      # 3. Instalar dependências NPM
+      - name: Instalar dependências
         run: |
           npm install --force --legacy-peer-deps
 
-      - name: 4. Detectar pasta de build web
-        id: detect-webdir
+      # 4. Build web
+      - name: Build Web
         run: |
+          npm run build
+          # Detecta a pasta de build web
           if [ -d "./dist" ]; then
-            echo "webDir=dist" >> $GITHUB_ENV
+            echo "WEB_DIR=dist" >> $GITHUB_ENV
           elif [ -d "./build" ]; then
-            echo "webDir=build" >> $GITHUB_ENV
+            echo "WEB_DIR=build" >> $GITHUB_ENV
           else
-            echo "Nenhuma pasta de build web encontrada. Certifique-se de rodar npm run build localmente"
+            echo "Nenhuma pasta de build web encontrada. Verifique seu npm run build"
             exit 1
           fi
 
-      - name: 5. Build Web
-        run: |
-          npm run build
-          echo "Build web concluído em $WEB_DIR"
-
-      - name: 6. Sincronizar Capacitor com Android
+      # 5. Sincronizar Capacitor com Android
+      - name: Sincronizar Capacitor
         run: |
           npx cap sync android --web-dir $WEB_DIR
 
-      - name: 7. Configurar Java 17
+      # 6. Configurar Java 17
+      - name: Configurar Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 8. Limpar cache do Gradle
-        run: |
-          cd android
-          ./gradlew clean
+      # 7. Tornar gradlew executável
+      - name: Tornar gradlew executável
+        run: chmod +x android/gradlew
 
-      - name: 9. Tornar gradlew executável
-        run: |
-          chmod +x android/gradlew
-
-      - name: 10. Atualizar Gradle Wrapper para 8.13
+      # 8. Atualizar Gradle Wrapper para 8.13
+      - name: Atualizar Gradle Wrapper
         run: |
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      - name: 11. Ajustar Java Compatibility
+      # 9. Limpar cache do Gradle
+      - name: Limpar Gradle
         run: |
           cd android
-          # Força Java 17 no módulo app
-          sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' app/build.gradle
-          sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' app/build.gradle
-          sed -i 's/jvmTarget = .*/jvmTarget = "17"/' app/build.gradle || true
-          # Força Java 17 no módulo capacitor-android
-          sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' capacitor-android/build.gradle || true
-          sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' capacitor-android/build.gradle || true
-          sed -i 's/jvmTarget = .*/jvmTarget = "17"/' capacitor-android/build.gradle || true
+          ./gradlew clean
 
-      - name: 12. Compilar APK
+      # 10. Forçar Java 17 em todos os módulos Android
+      - name: Ajustar Java Compatibility em todos os módulos
+        run: |
+          cd android
+          find . -name "build.gradle" -type f | while read file; do
+            sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' "$file" || true
+            sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' "$file" || true
+            sed -i 's/jvmTarget = .*/jvmTarget = "17"/' "$file" || true
+          done
+
+      # 11. Compilar APK
+      - name: Compilar APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: 13. Disponibilizar APK
+      # 12. Upload do APK como artefato
+      - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-final
