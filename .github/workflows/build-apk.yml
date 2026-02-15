@@ -28,7 +28,9 @@ jobs:
           distribution: 'temurin'  # Usar distribuição Temurin do OpenJDK
 
       - name: 5. Limpar o cache do Gradle
-        run: ./gradlew clean  # Limpar o cache do Gradle para evitar problemas com builds anteriores
+        run: |
+          cd android  # Navega para a pasta android
+          ./gradlew clean  # Limpa o cache do Gradle dentro da pasta android
 
       - name: 6. Recriar e Sincronizar a Plataforma Android
         run: |
@@ -53,4 +55,10 @@ jobs:
       - name: 9. Compilar APK (Usando gradlew)
         run: |
           cd android
-          ./gradlew assembleDe
+          ./gradlew assembleDebug  # Compila o APK usando o gradle wrapper
+
+      - name: 10. Disponibilizar APK para Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-final
+          path: android/app/build/outputs/apk/debug/app-debug.apk  # Caminho do APK gerado
