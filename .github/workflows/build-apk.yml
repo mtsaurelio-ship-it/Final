@@ -27,12 +27,8 @@ jobs:
       - name: Build Web
         run: |
           npm run build
-          # Detecta a pasta de build web
-          if [ -d "./dist" ]; then
-            echo "WEB_DIR=dist" >> $GITHUB_ENV
-          elif [ -d "./build" ]; then
-            echo "WEB_DIR=build" >> $GITHUB_ENV
-          else
+          # Verifica se a pasta web existe
+          if [ ! -d "./dist" ] && [ ! -d "./build" ]; then
             echo "Nenhuma pasta de build web encontrada. Verifique seu npm run build"
             exit 1
           fi
@@ -40,7 +36,7 @@ jobs:
       # 5. Sincronizar Capacitor com Android
       - name: Sincronizar Capacitor
         run: |
-          npx cap sync android --web-dir $WEB_DIR
+          npx cap sync android
 
       # 6. Configurar Java 17
       - name: Configurar Java 17
@@ -59,7 +55,7 @@ jobs:
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      # 9. Limpar cache do Gradle
+      # 9. Limpar Gradle
       - name: Limpar Gradle
         run: |
           cd android
