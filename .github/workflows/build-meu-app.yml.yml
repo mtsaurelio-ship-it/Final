@@ -1,4 +1,4 @@
-name: Gerar APK Capacitor Final v4
+name: Gerar APK Capacitor Ultra-Estavel
 on: workflow_dispatch
 
 jobs:
@@ -23,22 +23,24 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: 5. Sincronizar Capacitor com Android
+      - name: 5. Garantir Pasta Android e Sincronizar
         run: |
+          # Se a pasta android não existir no GitHub, o robô cria ela agora
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
           npx cap sync android
 
-      - name: 6. Instalar Gradle 8.2.1 (Versão de Compatibilidade Máxima)
-        run: |
-          wget https://services.gradle.org/distributions/gradle-8.2.1-bin.zip
-          sudo unzip -d /opt/gradle gradle-8.2.1-bin.zip
-          echo "/opt/gradle/gradle-8.2.1/bin" >> $GITHUB_PATH
+      - name: 6. Configurar Gradle (Ação Oficial)
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.2.1
 
-      - name: 7. Gerar Gradle Wrapper e Permissões
+      - name: 7. Gerar Wrapper e Corrigir Permissões
         run: |
           cd android
-          /opt/gradle/gradle-8.2.1/bin/gradle wrapper --gradle-version 8.2.1
+          gradle wrapper --gradle-version 8.2.1
           chmod +x gradlew
 
       - name: 8. Compilar APK (Debug)
@@ -49,5 +51,5 @@ jobs:
       - name: 9. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
         with:
-          name: app-operacional-final
+          name: app-final-construido
           path: android/app/build/outputs/apk/debug/app-debug.apk
