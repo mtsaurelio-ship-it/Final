@@ -1,4 +1,4 @@
-name: Gerar APK Capacitor Completo
+name: Gerar APK Capacitor Final
 on: workflow_dispatch
 
 jobs:
@@ -29,16 +29,16 @@ jobs:
         run: |
           npx cap sync android
 
-      - name: 6. Instalar Gradle 8.10 (Versão moderna)
+      - name: 6. Instalar Gradle 8.7 (Versão Estável)
         run: |
-          wget https://services.gradle.org/distributions/gradle-8.10-bin.zip
-          sudo unzip -d /opt/gradle gradle-8.10-bin.zip
-          echo "/opt/gradle/gradle-8.10/bin" >> $GITHUB_PATH
+          wget https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          sudo unzip -d /opt/gradle gradle-8.7-bin.zip
+          echo "/opt/gradle/gradle-8.7/bin" >> $GITHUB_PATH
 
       - name: 7. Gerar Gradle Wrapper e Permissões
         run: |
           cd android
-          /opt/gradle/gradle-8.10/bin/gradle wrapper --gradle-version 8.10
+          /opt/gradle/gradle-8.7/bin/gradle wrapper --gradle-version 8.7
           chmod +x gradlew
 
       - name: 8. Compilar APK (Debug)
