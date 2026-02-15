@@ -1,4 +1,4 @@
-name: Build APK Capacitor - Definitivo
+name: Build APK Capacitor - Final
 
 on:
   workflow_dispatch:
@@ -57,19 +57,25 @@ jobs:
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      # 9. Limpar Gradle
+      # 9. Garantir que todos os módulos usem Java 17
+      - name: Forçar Java 17 global
+        run: |
+          cd android
+          echo "org.gradle.java.home=$JAVA_HOME" >> gradle.properties
+
+      # 10. Limpar Gradle
       - name: Limpar Gradle
         run: |
           cd android
           ./gradlew clean
 
-      # 10. Compilar APK forçando Java 17 (override de qualquer configuração de plugin)
+      # 11. Compilar APK Debug
       - name: Compilar APK com Java 17
         run: |
           cd android
-          ./gradlew assembleDebug -Dorg.gradle.java.home=$JAVA_HOME -Dkotlin.compiler.jvmTarget=17
+          ./gradlew assembleDebug
 
-      # 11. Upload do APK como artefato
+      # 12. Upload do APK
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
