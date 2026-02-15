@@ -1,4 +1,4 @@
-name: Gerar APK Capacitor Ultra-Estavel
+name: Gerar APK Capacitor - Correcao Final
 on: workflow_dispatch
 
 jobs:
@@ -24,32 +24,34 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 5. Garantir Pasta Android e Sincronizar
+      - name: 5. Instalar Gradle (Necessário para criar o Wrapper)
         run: |
-          # Se a pasta android não existir no GitHub, o robô cria ela agora
+          sudo apt-get update
+          sudo apt-get install gradle -y
+
+      - name: 6. Configurar Pasta Android e Gerar Wrapper
+        run: |
+          # Adiciona a plataforma se não existir
           if [ ! -d "android" ]; then
             npx cap add android
           fi
+          
+          # Sincroniza os arquivos do site com o Android
           npx cap sync android
-
-      - name: 6. Configurar Gradle (Ação Oficial)
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.2.1
-
-      - name: 7. Gerar Wrapper e Corrigir Permissões
-        run: |
+          
+          # ENTRA na pasta e FORÇA a criação do gradlew
           cd android
           gradle wrapper --gradle-version 8.2.1
           chmod +x gradlew
+          ls -la  # Comando apenas para conferir no log se o arquivo apareceu
 
-      - name: 8. Compilar APK (Debug)
+      - name: 7. Compilar APK (Debug)
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: 9. Disponibilizar APK para Download
+      - name: 8. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
         with:
-          name: app-final-construido
+          name: app-final-sucesso
           path: android/app/build/outputs/apk/debug/app-debug.apk
