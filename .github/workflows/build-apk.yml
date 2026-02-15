@@ -20,9 +20,9 @@ jobs:
         run: |
           npm install --force --legacy-peer-deps
 
-      - name: 4. Build Web (gerar a pasta dist)
+      - name: 4. Build Web
         run: |
-          npm run build  # Gera a pasta ./dist com index.html
+          npm run build
 
       - name: 5. Sincronizar Capacitor com Android
         run: |
@@ -48,12 +48,20 @@ jobs:
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      - name: 10. Compilar APK
+      - name: 10. Ajustar Java Compatibility no Gradle
+        run: |
+          cd android
+          # Garante que compileOptions use Java 17
+          sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' app/build.gradle
+          sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' app/build.gradle
+          sed -i 's/jvmTarget = .*/jvmTarget = "17"/' app/build.gradle || true
+
+      - name: 11. Compilar APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: 11. Disponibilizar APK
+      - name: 12. Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-final
