@@ -1,4 +1,4 @@
-name: Build APK Capacitor
+name: Build APK Capacitor - Definitivo
 
 on:
   workflow_dispatch:
@@ -20,52 +20,65 @@ jobs:
         run: |
           npm install --force --legacy-peer-deps
 
-      - name: 4. Build Web
+      - name: 4. Detectar pasta de build web
+        id: detect-webdir
+        run: |
+          if [ -d "./dist" ]; then
+            echo "webDir=dist" >> $GITHUB_ENV
+          elif [ -d "./build" ]; then
+            echo "webDir=build" >> $GITHUB_ENV
+          else
+            echo "Nenhuma pasta de build web encontrada. Certifique-se de rodar npm run build localmente"
+            exit 1
+          fi
+
+      - name: 5. Build Web
         run: |
           npm run build
+          echo "Build web concluído em $WEB_DIR"
 
-      - name: 5. Sincronizar Capacitor com Android
+      - name: 6. Sincronizar Capacitor com Android
         run: |
-          npx cap sync android
+          npx cap sync android --web-dir $WEB_DIR
 
-      - name: 6. Configurar Java 17
+      - name: 7. Configurar Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 7. Limpar cache do Gradle
+      - name: 8. Limpar cache do Gradle
         run: |
           cd android
           ./gradlew clean
 
-      - name: 8. Tornar gradlew executável
+      - name: 9. Tornar gradlew executável
         run: |
           chmod +x android/gradlew
 
-      - name: 9. Atualizar Gradle Wrapper para 8.13
+      - name: 10. Atualizar Gradle Wrapper para 8.13
         run: |
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      - name: 10. Ajustar Java Compatibility no Gradle
+      - name: 11. Ajustar Java Compatibility
         run: |
           cd android
-          # App module
+          # Força Java 17 no módulo app
           sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' app/build.gradle
           sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' app/build.gradle
           sed -i 's/jvmTarget = .*/jvmTarget = "17"/' app/build.gradle || true
-          # Capacitor Android module
+          # Força Java 17 no módulo capacitor-android
           sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' capacitor-android/build.gradle || true
           sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' capacitor-android/build.gradle || true
           sed -i 's/jvmTarget = .*/jvmTarget = "17"/' capacitor-android/build.gradle || true
 
-      - name: 11. Compilar APK
+      - name: 12. Compilar APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: 12. Disponibilizar APK
+      - name: 13. Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-final
