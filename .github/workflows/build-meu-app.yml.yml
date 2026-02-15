@@ -1,50 +1,53 @@
-name: Gerar APK Capacitor
+name: Gerar APK Capacitor Completo
 on: workflow_dispatch
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout do código
+      - name: 1. Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar Node.js
+      - name: 2. Instalar Node.js (v22)
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Instalar Dependências e Build Web
+      - name: 3. Instalar Dependências e Build Web
         run: |
           npm install --force
           npm run build
 
-      - name: Configurar Java 21
+      - name: 4. Configurar Java 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: gradle
 
-      - name: Sincronizar Capacitor com Android
+      - name: 5. Sincronizar Capacitor com Android
         run: |
           npx cap sync android
 
-      - name: Instalar Gradle no Servidor
-        run: sudo apt-get update && sudo apt-get install gradle -y
+      - name: 6. Instalar Gradle 8.10 (Versão moderna)
+        run: |
+          wget https://services.gradle.org/distributions/gradle-8.10-bin.zip
+          sudo unzip -d /opt/gradle gradle-8.10-bin.zip
+          echo "/opt/gradle/gradle-8.10/bin" >> $GITHUB_PATH
 
-      - name: Gerar arquivos do Gradle (Wrapper)
+      - name: 7. Gerar Gradle Wrapper e Permissões
         run: |
           cd android
-          gradle wrapper
+          /opt/gradle/gradle-8.10/bin/gradle wrapper --gradle-version 8.10
           chmod +x gradlew
 
-      - name: Compilar APK (Debug)
+      - name: 8. Compilar APK (Debug)
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: Upload do APK
+      - name: 9. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
+          name: meu-projeto-final-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
