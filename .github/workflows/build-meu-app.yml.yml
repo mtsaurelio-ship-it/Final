@@ -25,12 +25,11 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Preparar Android
+- name: Gerar arquivos do Gradle (Caso faltem)
         run: |
-          npx cap sync android
-
-      - name: Dar permissão ao Gradle
-        run: chmod +x android/gradlew
+          cd android
+          gradle wrapper
+          chmod +x gradlew
 
       - name: Compilar APK (Debug)
         run: |
