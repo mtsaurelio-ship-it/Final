@@ -51,10 +51,14 @@ jobs:
       - name: 10. Ajustar Java Compatibility no Gradle
         run: |
           cd android
-          # Garante que compileOptions use Java 17
+          # App module
           sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' app/build.gradle
           sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' app/build.gradle
           sed -i 's/jvmTarget = .*/jvmTarget = "17"/' app/build.gradle || true
+          # Capacitor Android module
+          sed -i 's/sourceCompatibility = .*/sourceCompatibility = JavaVersion.VERSION_17/' capacitor-android/build.gradle || true
+          sed -i 's/targetCompatibility = .*/targetCompatibility = JavaVersion.VERSION_17/' capacitor-android/build.gradle || true
+          sed -i 's/jvmTarget = .*/jvmTarget = "17"/' capacitor-android/build.gradle || true
 
       - name: 11. Compilar APK
         run: |
