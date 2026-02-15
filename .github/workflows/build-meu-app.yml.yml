@@ -40,13 +40,16 @@ jobs:
           # Sincroniza os arquivos do site
           npx cap sync android
 
-      - name: 7. Compilar APK (Usando Gradle do Sistema)
+      - name: 7. Tornar gradlew Executável
+        run: |
+          chmod +x android/gradlew
+          
+      - name: 8. Compilar APK (Usando gradlew)
         run: |
           cd android
-          # Em vez de ./gradlew, usamos o gradle do sistema que instalamos no passo 5
-          gradle assembleDebug
+          ./gradlew assembleDebug  # Usando gradlew, não o gradle do sistema
 
-      - name: 8. Disponibilizar APK para Download
+      - name: 9. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-final
