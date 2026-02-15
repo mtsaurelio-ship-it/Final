@@ -24,12 +24,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 5. Instalar Gradle no Sistema
-        run: |
-          sudo apt-get update
-          sudo apt-get install gradle -y
-
-      - name: 6. Recriar Pasta Android e Sincronizar
+      - name: 5. Recriar Pasta Android e Sincronizar
         run: |
           # Remove a pasta android se ela estiver incompleta ou com erro
           rm -rf android
@@ -40,14 +35,18 @@ jobs:
           # Sincroniza os arquivos do site
           npx cap sync android
 
+      - name: 6. Verificar se gradlew Existe
+        run: |
+          ls -l android/gradlew  # Verifica se o gradlew está na pasta android
+
       - name: 7. Tornar gradlew Executável
         run: |
-          chmod +x android/gradlew
-          
+          chmod +x android/gradlew  # Torna gradlew executável
+
       - name: 8. Compilar APK (Usando gradlew)
         run: |
           cd android
-          ./gradlew assembleDebug  # Usando gradlew, não o gradle do sistema
+          ./gradlew assembleDebug  # Usa gradlew para compilar o APK
 
       - name: 9. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
