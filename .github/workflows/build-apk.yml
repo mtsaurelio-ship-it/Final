@@ -1,52 +1,56 @@
 name: Build APK Capacitor
 
 on:
-  workflow_dispatch:  # Este evento permite que você execute o workflow manualmente
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 1. Checkout do código
-        uses: actions/checkout@v4  # Faz o checkout do código do repositório
+        uses: actions/checkout@v4
 
       - name: 2. Instalar Node.js (v22)
         uses: actions/setup-node@v4
         with:
-          node-version: 22  # Instala a versão do Node.js que você usa no seu projeto
+          node-version: 22
 
       - name: 3. Instalar Dependências
         run: |
-          npm install --force  # Instala as dependências do projeto
+          npm install --force --legacy-peer-deps  # Instala dependências ignorando conflitos de peer dependencies
 
-      - name: 4. Desinstalar e Reinstalar o Plugin Capacitor Cordova
+      - name: 4. Sincronizar Capacitor com Android
         run: |
-          npm uninstall @capacitor/cordova  # Desinstala o plugin Cordova
-          npm install @capacitor/cordova  # Reinstala o plugin Cordova
-          
-      - name: 5. Sincronizar o Capacitor com a Plataforma Android
-        run: |
-          npx cap sync android  # Sincroniza o Capacitor com a plataforma Android
+          npx cap sync android  # Sincroniza plugins e plataforma Android
 
-      - name: 6. Configurar Java 17
+      - name: 5. Configurar Java 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'  # Usar Java 17
-          distribution: 'temurin'  # Usar a distribuição Temurin do OpenJDK
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: 7. Limpar o cache do Gradle
+      - name: 6. Limpar o cache do Gradle
         run: |
-          cd android  # Navega até a pasta android
-          ./gradlew clean  # Limpa o cache do Gradle dentro da pasta android
+          cd android
+          ./gradlew clean
 
-      - name: 8. Compilar APK (Usando Gradle)
+      - name: 7. Tornar gradlew executável
         run: |
-          cd android  # Navega até a pasta android
-          ./gradlew assembleDebug  # Compila o APK usando o gradle wrapper
+          chmod +x android/gradlew
 
-      - name: 9. Disponibilizar APK para Download
+      - name: 8. Configurar versão do Gradle
+        run: |
+          cd android
+          ./gradlew wrapper --gradle-version 7.5 --distribution-type all
+
+      - name: 9. Compilar APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: 10. Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-final  # Nome do artefato
-          path: android/app/build/outputs/apk/debug/app-debug.apk  # Caminho do APK gerado
+          name: app-debug-final
+          path: android/app/build/outputs/apk/debug/app-debug.apk
