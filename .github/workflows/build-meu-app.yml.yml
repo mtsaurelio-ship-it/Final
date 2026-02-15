@@ -1,4 +1,4 @@
-name: Gerar APK Capacitor - Correcao Final
+name: Gerar APK Capacitor - Solucao Definitiva
 on: workflow_dispatch
 
 jobs:
@@ -24,34 +24,42 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 5. Instalar Gradle (Necessário para criar o Wrapper)
+      - name: 5. Instalar Gradle no Sistema
         run: |
           sudo apt-get update
           sudo apt-get install gradle -y
 
-      - name: 6. Configurar Pasta Android e Gerar Wrapper
+      - name: 6. Preparar Android e Gerar Executaveis
         run: |
-          # Adiciona a plataforma se não existir
+          # Adiciona a pasta android se ela não existir
           if [ ! -d "android" ]; then
             npx cap add android
           fi
-          
-          # Sincroniza os arquivos do site com o Android
+
+          # Sincroniza o código do site com o projeto Android
           npx cap sync android
-          
-          # ENTRA na pasta e FORÇA a criação do gradlew
+
+          # Entra na pasta android e força a criação do wrapper
           cd android
           gradle wrapper --gradle-version 8.2.1
+          
+          # Verifica se o arquivo foi criado, se não, tenta criar de novo
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper
+          fi
+          
+          # Garante a permissão de execução
           chmod +x gradlew
-          ls -la  # Comando apenas para conferir no log se o arquivo apareceu
+          echo "Conteudo da pasta android:"
+          ls -F
 
       - name: 7. Compilar APK (Debug)
+        working-directory: ./android
         run: |
-          cd android
           ./gradlew assembleDebug
 
       - name: 8. Disponibilizar APK para Download
         uses: actions/upload-artifact@v4
         with:
-          name: app-final-sucesso
+          name: app-debug-sucesso
           path: android/app/build/outputs/apk/debug/app-debug.apk
