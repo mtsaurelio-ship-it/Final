@@ -18,38 +18,42 @@ jobs:
 
       - name: 3. Instalar Dependências
         run: |
-          npm install --force --legacy-peer-deps  # Instala dependências ignorando conflitos de peer dependencies
+          npm install --force --legacy-peer-deps
 
-      - name: 4. Sincronizar Capacitor com Android
+      - name: 4. Build Web (gerar a pasta dist)
         run: |
-          npx cap sync android  # Sincroniza plugins e plataforma Android
+          npm run build  # Gera a pasta ./dist com index.html
 
-      - name: 5. Configurar Java 17
+      - name: 5. Sincronizar Capacitor com Android
+        run: |
+          npx cap sync android  # Sincroniza plugins e assets com a plataforma Android
+
+      - name: 6. Configurar Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 6. Limpar o cache do Gradle
+      - name: 7. Limpar cache do Gradle
         run: |
           cd android
           ./gradlew clean
 
-      - name: 7. Tornar gradlew executável
+      - name: 8. Tornar gradlew executável
         run: |
           chmod +x android/gradlew
 
-      - name: 8. Configurar versão do Gradle
+      - name: 9. Configurar versão do Gradle
         run: |
           cd android
           ./gradlew wrapper --gradle-version 7.5 --distribution-type all
 
-      - name: 9. Compilar APK
+      - name: 10. Compilar APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: 10. Disponibilizar APK
+      - name: 11. Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-final
