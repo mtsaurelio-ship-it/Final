@@ -38,8 +38,7 @@ jobs:
 
       # 5. Sincronizar Capacitor com Android
       - name: Sincronizar Capacitor
-        run: |
-          npx cap sync android
+        run: npx cap sync android
 
       # 6. Configurar Java 17
       - name: Configurar Java 17
@@ -58,14 +57,20 @@ jobs:
           cd android
           ./gradlew wrapper --gradle-version 8.13 --distribution-type all
 
-      # 9. Limpar Gradle
+      # 9. Forçar Java 17 no gradle.properties do wrapper
+      - name: Forçar Java 17 no Gradle Wrapper
+        run: |
+          cd android
+          echo "org.gradle.java.home=$JAVA_HOME" >> gradle.properties
+
+      # 10. Limpar Gradle
       - name: Limpar Gradle
         run: |
           cd android
           ./gradlew clean
 
-      # 10. Forçar Java 17 em todos os módulos Android
-      - name: Forçar Java 17 em todos os módulos Android
+      # 11. Forçar Java 17 em todos os build.gradle
+      - name: Forçar Java 17 em todos os módulos
         run: |
           cd android
           find . -name "build.gradle" -type f | while read file; do
@@ -74,13 +79,13 @@ jobs:
             sed -i 's/jvmTarget = .*/jvmTarget = "17"/' "$file" || true
           done
 
-      # 11. Compilar APK
+      # 12. Compilar APK
       - name: Compilar APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      # 12. Upload do APK como artefato
+      # 13. Upload do APK como artefato
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
